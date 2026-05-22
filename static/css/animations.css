@@ -1,0 +1,352 @@
+/* ============================================================
+   TASKPULSE — PREMIUM ANIMATIONS & AESTHETIC UPGRADES
+   Applied on top of style.css
+   ============================================================ */
+
+/* 1. Subtle Animated Background for the entire app */
+body {
+    background: linear-gradient(-45deg, #e8eaf0, #eef0f8, #e6e9f4, #f0eef8);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+}
+body.dark-mode {
+    background: linear-gradient(-45deg, #0a0a12, #0f0f1a, #0d0d18, #12101e);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+}
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 2. Glassmorphism Sidebar */
+.sidebar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255,255,255,0.5) !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+body.dark-mode .sidebar {
+    background: rgba(18, 18, 28, 0.9) !important;
+    border-right: 1px solid rgba(255,255,255,0.06) !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+}
+
+/* 3. Logo Animation */
+.logo {
+    animation: logoEntry 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+.logo i {
+    animation: boltSpin 3s ease-in-out infinite;
+}
+@keyframes boltSpin {
+    0%, 100% { transform: rotate(0deg) scale(1); color: var(--primary); }
+    50% { transform: rotate(-10deg) scale(1.2); color: #ed8936; }
+}
+@keyframes logoEntry {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* 4. Nav Item Staggered Entry */
+.nav-links li {
+    animation: navSlideIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.nav-links li:nth-child(1) { animation-delay: 0.1s; }
+.nav-links li:nth-child(2) { animation-delay: 0.2s; }
+.nav-links li:nth-child(3) { animation-delay: 0.3s; }
+.nav-links li:nth-child(4) { animation-delay: 0.4s; }
+.nav-links li:nth-child(5) { animation-delay: 0.5s; }
+.nav-links li:nth-child(6) { animation-delay: 0.6s; }
+.nav-links li:nth-child(7) { animation-delay: 0.7s; }
+@keyframes navSlideIn {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.nav-links li:hover {
+    transform: translateX(8px);
+    padding-left: 2rem;
+}
+
+/* 5. Header animated entry */
+header {
+    animation: headerSlide 0.7s ease both;
+}
+@keyframes headerSlide {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 6. Welcome message gradient text */
+.welcome-msg {
+    background: linear-gradient(120deg, var(--primary), #7209b7, var(--info));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShimmer 4s linear infinite;
+}
+@keyframes textShimmer {
+    to { background-position: 200% center; }
+}
+
+/* 7. Section fade in on view */
+.view-section.active {
+    animation: sectionPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+@keyframes sectionPop {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 8. Stat cards stagger + shine sweep */
+.stat-card {
+    animation: cardPop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    position: relative;
+    overflow: hidden;
+}
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+.stat-card:nth-child(5) { animation-delay: 0.5s; }
+@keyframes cardPop {
+    from { opacity: 0; transform: translateY(30px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 80%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-20deg);
+    transition: 0s;
+}
+.stat-card:hover::after {
+    left: 200%;
+    transition: left 0.7s ease;
+}
+
+/* 9. Stat number count-up feel */
+.stat-details p {
+    background: linear-gradient(135deg, var(--primary), #7209b7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 10. Plan Cards */
+.plan-card {
+    animation: cardPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    position: relative;
+    overflow: hidden;
+}
+.plan-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--primary), #7209b7, var(--info));
+    background-size: 200% auto;
+    animation: borderFlow 3s linear infinite;
+}
+@keyframes borderFlow {
+    to { background-position: 200% center; }
+}
+
+/* 11. Task Cards */
+.task-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.task-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(67,97,238,0) 0%, rgba(67,97,238,0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.task-card:hover::after { opacity: 1; }
+.task-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(67,97,238,0.2), 0 0 0 2px rgba(67,97,238,0.2);
+}
+
+/* 12. Kanban columns stagger entry */
+.task-column:nth-child(1) { animation: colSlide 0.7s ease 0.1s both; }
+.task-column:nth-child(2) { animation: colSlide 0.7s ease 0.3s both; }
+.task-column:nth-child(3) { animation: colSlide 0.7s ease 0.5s both; }
+@keyframes colSlide {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 13. Timer pulsating ring */
+.timer-display {
+    position: relative;
+    display: inline-block;
+}
+.timer-display::before {
+    content: '';
+    position: absolute;
+    inset: -15px;
+    border-radius: 50%;
+    border: 3px solid var(--primary);
+    animation: timerRing 2s ease-in-out infinite;
+    opacity: 0;
+}
+@keyframes timerRing {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.2); opacity: 0; }
+}
+
+/* 14. Buttons premium  */
+.btn {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s, opacity 0.6s;
+    opacity: 0;
+}
+.btn:active::after {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+}
+.btn-primary { animation: btnGlow 3s ease-in-out infinite; }
+@keyframes btnGlow {
+    0%, 100% { box-shadow: 0 4px 15px rgba(67,97,238,0.3); }
+    50% { box-shadow: 0 4px 25px rgba(67,97,238,0.6), 0 0 0 4px rgba(67,97,238,0.1); }
+}
+
+/* 15. Modal animations */
+.modal-content {
+    animation: modalBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+@keyframes modalBounce {
+    0% { opacity: 0; transform: scale(0.7) translateY(-30px); }
+    60% { transform: scale(1.02) translateY(5px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 16. Toast animations */
+.toast {
+    border-radius: 16px !important;
+}
+
+/* 17. Drag over premium effect */
+.dropzone.drag-over {
+    background: linear-gradient(135deg, rgba(67,97,238,0.08), rgba(114,9,183,0.08)) !important;
+    border: 2px dashed var(--primary) !important;
+    box-shadow: inset 0 0 20px rgba(67,97,238,0.1);
+    transform: scale(1.01);
+}
+
+/* 18. Section title animated underline */
+.section-title {
+    position: relative;
+    display: inline-block;
+}
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 0;
+    height: 3px;
+    width: 0;
+    background: linear-gradient(90deg, var(--primary), #7209b7);
+    border-radius: 3px;
+    animation: underlineGrow 0.8s ease 0.3s forwards;
+}
+@keyframes underlineGrow {
+    to { width: 100%; }
+}
+
+/* 19. Chart container shimmer */
+.chart-container {
+    position: relative;
+    overflow: hidden;
+    animation: cardPop 0.8s ease 0.4s both;
+}
+.chart-container::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: linear-gradient(45deg, var(--primary), #7209b7, var(--info), var(--primary));
+    background-size: 300% 300%;
+    border-radius: inherit;
+    z-index: -1;
+    animation: borderGlow 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+.chart-container:hover::before { opacity: 1; }
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 20. Progress bar animated fill */
+.task-progress-fill {
+    background: linear-gradient(90deg, #4cc9f0, #4361ee, #7209b7) !important;
+    background-size: 200% auto !important;
+    animation: progressShimmer 2s linear infinite;
+}
+@keyframes progressShimmer {
+    to { background-position: 200% center; }
+}
+
+/* 21. Form inputs with glow on focus */
+input:focus, select:focus, textarea:focus {
+    animation: inputGlow 0.3s ease forwards;
+}
+@keyframes inputGlow {
+    to {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67,97,238,0.2), 0 4px 12px rgba(67,97,238,0.1);
+    }
+}
+
+/* 22. Timer running pulse on the number */
+@keyframes timerPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+.timer-running #timer-display {
+    animation: timerPulse 1s ease-in-out infinite;
+    color: var(--danger) !important;
+}
+
+/* 23. Empty state bounce */
+.empty-state i {
+    animation: emptyBounce 2s ease-in-out infinite;
+}
+@keyframes emptyBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* 24. Badge pop in */
+.badge {
+    animation: badgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+@keyframes badgePop {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskPulse - The Ultimate Study Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #7209b7;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        /* Animated Gradient Background */
+        body { 
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #111827, #171033);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Pulse Animation */
+        @keyframes pulse-btn {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+
+        /* Navigation */
+        nav {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+        }
+        .nav-buttons a {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+        .btn-login { color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-login:hover { background: rgba(255,255,255,0.1); }
+        .btn-signup { background: var(--primary); color: #fff; }
+        .btn-signup:hover { background: #3a56d4; transform: translateY(-2px); }
+
+        /* Hero Section */
+        .hero {
+            padding: 10rem 5% 5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            min-height: 100vh;
+            position: relative;
+        }
+        .hero-text { flex: 1; z-index: 10; }
+        .hero-text h1 {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #4cc9f0, #4361ee, #7209b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-text p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+        
+        .cta-big {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 50px;
+            text-decoration: none;
+            animation: pulse-btn 2s infinite;
+            transition: transform 0.3s;
+        }
+        .cta-big:hover {
+            transform: scale(1.05);
+        }
+
+        /* Blobs */
+        .blob {
+            position: absolute;
+            background: linear-gradient(135deg, #7209b7, #4361ee);
+            filter: blur(100px);
+            opacity: 0.5;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite;
+        }
+        .blob-1 { top: 20%; right: 5%; width: 400px; height: 400px; border-radius: 50%; }
+        .blob-2 { bottom: -10%; left: -10%; width: 500px; height: 500px; border-radius: 50%; background: linear-gradient(135deg, #4cc9f0, #4361ee); animation-delay: 2s; }
+        
+        /* Interactive Mockup */
+        .hero-visual {
+            flex: 1;
+            position: relative;
+            z-index: 10;
+        }
+        .mockup-window {
+            background: #1e293b;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(67, 97, 238, 0.3);
+            overflow: hidden;
+            transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: float 8s ease-in-out infinite;
+        }
+        .mockup-window:hover { transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02); }
+        .mockup-header {
+            background: #0f172a;
+            padding: 1rem;
+            display: flex;
+            gap: 8px;
+        }
+        .mockup-dot { width: 12px; height: 12px; border-radius: 50%; background: #ef4444; }
+        .mockup-dot:nth-child(2) { background: #f59e0b; }
+        .mockup-dot:nth-child(3) { background: #10b981; }
+        .mockup-body { padding: 2rem; display: grid; gap: 1rem; }
+        .mock-card {
+            background: #334155;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            display: flex;
+            justify-content: space-between;
+            transition: transform 0.3s;
+        }
+        .mock-card:hover { transform: translateX(10px); }
+        .mock-card:nth-child(2) { border-left-color: #ef4444; }
+
+        /* How it Works Section */
+        .section {
+            padding: 6rem 5%;
+            position: relative;
+            z-index: 10;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 4rem;
+        }
+        .section-title span { color: var(--primary); }
+        
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        .step-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s;
+        }
+        .step-card:hover::before { transform: scaleX(1); }
+        .step-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.05); }
+        .step-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to bottom, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .step-card h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .step-card p { color: #94a3b8; line-height: 1.6; }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            align-items: center;
+        }
+        .feature-text h2 { font-size: 2.5rem; margin-bottom: 1rem; color: #4cc9f0; }
+        .feature-text p { font-size: 1.1rem; color: #94a3b8; line-height: 1.7; margin-bottom: 2rem; }
+        .feature-list li {
+            list-style: none;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
+        }
+        .feature-list li i { color: #10b981; font-size: 1.2rem; }
+        .feature-img {
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transform: rotate(2deg);
+            transition: transform 0.5s;
+        }
+        .feature-img:hover { transform: rotate(0deg) scale(1.05); }
+        
+        .huge-stat { font-size: 4rem; font-weight: 900; color: var(--primary); }
+        
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 8rem 5%;
+            background: linear-gradient(to bottom, transparent, rgba(67, 97, 238, 0.1));
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section h2 { font-size: 3.5rem; margin-bottom: 1.5rem; z-index: 10; position: relative; }
+        
+        footer {
+            padding: 2rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #64748b;
+        }
+
+        @media (max-width: 900px) {
+            .hero, .features-grid { flex-direction: column; text-align: center; }
+            .steps-container { grid-template-columns: 1fr; }
+            .hero-text h1 { font-size: 3rem; }
+            .feature-list li { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav data-aos="fade-down">
+        <a href="#" class="logo">
+            <i class="fa-solid fa-bolt" style="color: #ed8936;"></i> TaskPulse
+        </a>
+        <div class="nav-buttons">
+            <a href="/login" class="btn-login">Log In</a>
+            <a href="/register" class="btn-signup">Get Started Free</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <div class="hero-text" data-aos="fade-right">
+            <h1>Master Your Studies, Destroy Deadlines.</h1>
+            <p>TaskPulse is a premium, AI-assisted study planner featuring rule-based risk engines, dynamic Pomodoro tracking, and immersive focus environments to keep you ahead of the curve.</p>
+            
+            <a href="/register" class="cta-big">
+                <i class="fa-solid fa-rocket"></i> Launch Application
+            </a>
+        </div>
+        
+        <div class="hero-visual" data-aos="fade-left">
+            <div class="mockup-window">
+                <div class="mockup-header">
+                    <div class="mockup-dot"></div>
+                    <div class="mockup-dot"></div>
+                    <div class="mockup-dot"></div>
+                </div>
+                <div class="mockup-body">
+                    <div style="font-size:0.8rem; color:#94a3b8; font-weight:600;">ACTIVE TASKS</div>
+                    <div class="mock-card">
+                        <div>
+                            <div style="font-weight:600; margin-bottom:5px;">Study Machine Learning API</div>
+                            <div style="font-size:0.8rem; color:#cbd5e1;">In Progress • Diff: Hard</div>
+                        </div>
+                        <span style="background: rgba(16,185,129,0.2); color:#10b981; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; align-self: flex-start;">On Track</span>
+                    </div>
+                    <div class="mock-card">
+                        <div>
+                            <div style="font-weight:600; margin-bottom:5px;">Database Architecture Exam</div>
+                            <div style="font-size:0.8rem; color:#cbd5e1;">Pending • Diff: Medium</div>
+                        </div>
+                        <span style="background: rgba(239,68,68,0.2); color:#ef4444; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; align-self: flex-start;">High Risk</span>
+                    </div>
+                    <div style="margin-top:1rem; padding:1.5rem; background: rgba(0,0,0,0.2); border-radius:8px; text-align:center;">
+                        <i class="fa-solid fa-fire" style="font-size:3rem; color:#ffb703; margin-bottom:10px;"></i>
+                        <div style="font-weight:600; font-size:1.2rem;">🔥 5 Day Streak!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="section">
+        <h2 class="section-title" data-aos="fade-up">How <span>TaskPulse</span> Works</h2>
+        <div class="steps-container">
+            <div class="step-card" data-aos="fade-up" data-aos-delay="100">
+                <i class="fa-solid fa-list-check step-icon"></i>
+                <h3>1. Build Your Plan</h3>
+                <p>Create dedicated study plans for your courses. Use our 1-click generators to automatically inject smart tasks into your syllabus.</p>
+            </div>
+            <div class="step-card" data-aos="fade-up" data-aos-delay="200">
+                <i class="fa-solid fa-brain step-icon"></i>
+                <h3>2. Calculate Risk</h3>
+                <p>Our intelligent system constantly monitors your deadlines and flags "Critical" or "High Risk" tasks before they spiral out of control.</p>
+            </div>
+            <div class="step-card" data-aos="fade-up" data-aos-delay="300">
+                <i class="fa-solid fa-headphones step-icon"></i>
+                <h3>3. Enter Zen Mode</h3>
+                <p>Launch the Pomodoro timer, activate Zen Mode, and immerse yourself in ambient focus audio to crush your tasks.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURE HIGHLIGHT 1 -->
+    <div class="section" style="background: rgba(0,0,0,0.2);">
+        <div class="features-grid">
+            <div class="feature-img" data-aos="zoom-in-right">
+                <div style="text-align: center; color: white;">
+                    <i class="fa-solid fa-chart-pie" style="font-size: 8rem; color: var(--primary); margin-bottom: 20px;"></i>
+                    <h3 style="font-size: 2rem;">Real-time Analytics</h3>
+                </div>
+            </div>
+            <div class="feature-text" data-aos="fade-left">
+                <h2>Advanced Dashboard Visualizations</h2>
+                <p>Stop guessing where your time goes. TaskPulse includes enterprise-grade Chart.js integrations to track your workflow efficiency.</p>
+                <ul class="feature-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Interactive Doughnut Charts for Task Status</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Dynamic Progress Trackers per Task</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Export complete CSV Activity Reports instantly</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURE HIGHLIGHT 2 -->
+    <div class="section">
+        <div class="features-grid">
+            <div class="feature-text" data-aos="fade-right">
+                <h2>Stay Motivated with Gamification</h2>
+                <p>Studying shouldn't be boring. We've built satisfying micro-interactions directly into the platform to keep you addicted to productivity.</p>
+                <ul class="feature-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Duolingo-style Daily Study Streaks</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Confetti explosions on Task Completion</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Native OS Push Notifications for Timers</li>
+                </ul>
+            </div>
+            <div class="feature-img" data-aos="zoom-in-left" style="transform: rotate(-2deg);">
+                <div style="text-align: center; color: white;">
+                    <div class="huge-stat">🔥 10</div>
+                    <h3 style="font-size: 1.5rem; color: #ffb703;">Day Focus Streak</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL CTA -->
+    <div class="cta-section" data-aos="zoom-in">
+        <h2>Ready to transform your workflow?</h2>
+        <p style="font-size: 1.2rem; color: #cbd5e1; margin-bottom: 2rem;">Join thousands of students and professionals optimizing their time.</p>
+        <a href="/register" class="cta-big">
+            Get Started For Free
+        </a>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 TaskPulse Productivity Suite. Built with passion.</p>
+    </footer>
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 100
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskPulse - Smart Study Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Quill Rich Text Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=9">
+    <link rel="stylesheet" href="/static/css/animations.css?v=9">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- FullCalendar -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <!-- Quill JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+</head>
+<body class="light-mode">
+
+    <!-- ===== ANIMATED BACKGROUND LAYERS ===== -->
+    <!-- Layer 1: Neural-Network Particle Canvas -->
+    <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+    <!-- Layer 2: Floating Orbs -->
+    <div id="orb-container" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden;"></div>
+    <!-- ===== END BACKGROUND ===== -->
+
+    <div class="app-container" style="position:relative;z-index:1;">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-bolt"></i>
+                <span>TaskPulse</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="active" data-view="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li data-view="calendar-view">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <span>Calendar</span>
+                </li>
+                <li data-view="study-plans">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>Study Plans</span>
+                </li>
+                <li data-view="tasks">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Tasks</span>
+                </li>
+                <li data-view="timer">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Focus Timer</span>
+                </li>
+                <li data-view="settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </li>
+                <li id="nav-admin" style="display: none;">
+                    <i class="fa-solid fa-shield-halved" style="color:var(--danger);"></i>
+                    <span style="color:var(--danger); font-weight:600;">Admin Panel</span>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="theme-toggle" id="theme-toggle" style="margin-bottom: 1rem;">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>Dark Mode</span>
+                </div>
+                <div class="logout-btn" id="logout-btn" style="cursor: pointer; color: var(--danger); font-weight: 500; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Log Out</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header>
+                <div class="welcome-msg" id="welcome-msg">Welcome back! <span id="streak-display" style="color:#ffb703; font-weight: bold; margin-left:10px;"></span></div>
+                <div class="date-display" id="date-display"></div>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view-section active">
+                <div class="section-header">
+                    <h2 class="section-title">Weekly Summary Dashboard</h2>
+                    <button class="btn btn-secondary" id="btn-export-csv" title="Export Progress to CSV">
+                        <i class="fa-solid fa-file-csv"></i> Export Report
+                    </button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-list"></i></div>
+                        <div class="stat-details">
+                            <h3>Total Tasks</h3>
+                            <p id="dash-total-tasks">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success"><i class="fa-solid fa-check"></i></div>
+                        <div class="stat-details">
+                            <h3>Completed</h3>
+                            <p id="dash-completed-tasks">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning"><i class="fa-solid fa-clock"></i></div>
+                        <div class="stat-details">
+                            <h3>Pending</h3>
+                            <p id="dash-pending-tasks">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger"><i class="fa-solid fa-fire"></i></div>
+                        <div class="stat-details">
+                            <h3>High Risk</h3>
+                            <p id="dash-risk-tasks">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon info"><i class="fa-solid fa-stopwatch"></i></div>
+                        <div class="stat-details">
+                            <h3>Time Spent (min)</h3>
+                            <p id="dash-time-spent">-</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </section>
+            
+            <!-- Calendar View -->
+            <section id="calendar-view" class="view-section">
+                <h2 class="section-title">Schedule Overview</h2>
+                <div class="calendar-container">
+                    <div id="calendar"></div>
+                </div>
+            </section>
+
+            <!-- Study Plans View -->
+            <section id="study-plans" class="view-section">
+                <div class="section-header">
+                    <h2 class="section-title">Study Plans</h2>
+                    <button class="btn btn-primary" id="btn-create-plan"><i class="fa-solid fa-plus"></i> New Plan</button>
+                </div>
+                <div class="plans-grid" id="plans-container">
+                    <!-- Plans dynamically injected here -->
+                </div>
+            </section>
+
+            <!-- Tasks View -->
+            <section id="tasks" class="view-section">
+                <div class="section-header">
+                    <h2 class="section-title">Task Management</h2>
+                    <button class="btn btn-primary" id="btn-add-task" style="display: none;"><i class="fa-solid fa-plus"></i> Add Task</button>
+                </div>
+                <div class="task-filters" style="max-width: none; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <select id="filter-plan" style="margin-bottom: 0;">
+                            <option value="">Select a Study Plan...</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="search-task" placeholder="🔍 Search tasks..." style="margin-bottom: 0;">
+                    </div>
+                    <div>
+                        <select id="filter-priority" style="margin-bottom: 0;">
+                            <option value="All">All Priorities</option>
+                            <option value="High">High Priority</option>
+                            <option value="Medium">Medium Priority</option>
+                            <option value="Low">Low Priority</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="tasks-board" id="tasks-board" style="display: none;">
+                    <div class="task-column" id="col-pending">
+                        <h3 class="column-title">Pending</h3>
+                        <div class="task-list dropzone" data-status="Pending"></div>
+                    </div>
+                    <div class="task-column" id="col-inprogress">
+                        <h3 class="column-title">In Progress</h3>
+                        <div class="task-list dropzone" data-status="In Progress"></div>
+                    </div>
+                    <div class="task-column" id="col-completed">
+                        <h3 class="column-title">Completed</h3>
+                        <div class="task-list dropzone" data-status="Completed"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Focus Timer View -->
+            <section id="timer" class="view-section">
+                <h2 class="section-title">Focus Timer (Pomodoro)</h2>
+                <div class="timer-container">
+                    <div class="timer-display" id="timer-display">25:00</div>
+                    <div class="timer-controls">
+                        <button class="btn btn-primary btn-lg" id="btn-timer-start"><i class="fa-solid fa-play"></i> Start</button>
+                        <button class="btn btn-secondary btn-lg" id="btn-timer-pause"><i class="fa-solid fa-pause"></i> Pause</button>
+                        <button class="btn btn-danger btn-lg" id="btn-timer-reset"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                    </div>
+                    
+                    <div style="margin-top:20px;">
+                        <button class="btn btn-secondary" id="btn-zen-mode" style="width:100%; border: 1px solid var(--border-color);"><i class="fa-solid fa-spa"></i> Toggle Zen Mode</button>
+                    </div>
+                    
+                    <div class="timer-task-select">
+                        <label>Assign time block to task:</label>
+                        <select id="timer-task-dropdown">
+                            <option value="">No task selected</option>
+                        </select>
+                    </div>
+
+                    <!-- Focus Music Player -->
+                    <div class="music-player-container">
+                        <h4><i class="fa-solid fa-headphones"></i> Focus Audio</h4>
+                        <div class="audio-controls">
+                            <select id="focus-audio-select">
+                                <option value="">Silent (Choose a sound...)</option>
+                                <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Deep Focus Flow</option>
+                                <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">Ambient Study Vibe</option>
+                                <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3">Electronic Concentration</option>
+                                <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3">Lo-Fi Rhythmic</option>
+                                <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3">Upbeat Productivity</option>
+                            </select>
+                            <button class="btn btn-secondary" id="btn-audio-toggle" style="margin-left:10px;">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                        <div class="volume-control">
+                            <i class="fa-solid fa-volume-low" style="color: var(--text-muted);"></i>
+                            <input type="range" id="audio-volume" class="progress-slider" min="0" max="1" step="0.01" value="0.4" style="margin-bottom:0;">
+                            <i class="fa-solid fa-volume-high" style="color: var(--text-muted);"></i>
+                        </div>
+                        <audio id="focus-audio-element" loop></audio>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings View -->
+            <section id="settings" class="view-section">
+                <div class="section-header">
+                    <h2 class="section-title">Account Settings</h2>
+                </div>
+                <div style="max-width: 500px; background: var(--card-bg); padding: 2rem; border-radius: var(--radius); box-shadow: var(--shadow);">
+                    <form id="form-settings">
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" id="settings-name" placeholder="Leave blank to keep current">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="settings-email" placeholder="Leave blank to keep current">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="settings-password" placeholder="Leave blank to keep current password">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Profile</button>
+                    </form>
+                    <hr style="border-color:var(--border-color);margin:2rem 0;">
+                    <h3 style="margin-bottom:1rem;"><i class="fa-solid fa-envelope"></i> Email Deadline Reminders</h3>
+                    <p style="color:var(--text-muted);margin-bottom:1rem;font-size:0.9rem;">Enter your Gmail + an App Password to enable email alerts for risky tasks.</p>
+                    <form id="form-email-settings">
+                        <div class="form-group">
+                            <label>Gmail Address</label>
+                            <input type="email" id="smtp-email" placeholder="your.gmail@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Gmail App Password</label>
+                            <input type="password" id="smtp-password" placeholder="xxxx xxxx xxxx xxxx">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fa-solid fa-floppy-disk"></i> Save & Enable</button>
+                    </form>
+                    <button id="btn-send-reminders" class="btn btn-secondary" style="width:100%;margin-top:1rem;"><i class="fa-solid fa-paper-plane"></i> Send Test Reminder Now</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== ONBOARDING OVERLAY (Feature 5) ===== -->
+    <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9000;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+        <div style="background:var(--card-bg);border-radius:24px;padding:3rem;max-width:480px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.4);animation:modalBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275);">
+            <div style="font-size:4rem;margin-bottom:1rem;">🚀</div>
+            <h2 style="font-size:1.8rem;margin-bottom:1rem;">Welcome to TaskPulse!</h2>
+            <p style="color:var(--text-muted);margin-bottom:2rem;line-height:1.6;">Let's take a quick 30-second tour so you know where everything is. Ready?</p>
+            <button id="btn-start-tour" class="btn btn-primary" style="width:100%;font-size:1.1rem;justify-content:center;"><i class="fa-solid fa-map"></i> Start Tour</button>
+            <button id="btn-skip-tour" style="margin-top:1rem;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.9rem;">Skip for now</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- Create Plan Modal -->
+    <div class="modal" id="modal-plan">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Create Study Plan</h2>
+            <form id="form-plan">
+                <div class="form-group">
+                    <label>Plan Title</label>
+                    <input type="text" id="plan-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Auto-Generate Tasks (Optional Template)</label>
+                    <select id="plan-template" style="margin-bottom: 0;">
+                        <option value="">No Template (Empty Plan)</option>
+                        <option value="software_eng">Software Engineering Project</option>
+                        <option value="exam_prep">Midterm/Final Exam Prep Week</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Save Plan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Task Modal -->
+    <div class="modal" id="modal-task">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-task-title">Add New Task</h2>
+            <form id="form-task">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label>Task Title</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Deadline</label>
+                    <input type="date" id="task-deadline" required>
+                </div>
+                <!-- Tags Input -->
+                <div class="form-group">
+                    <label>Tags (Comma separated)</label>
+                    <input type="text" id="task-tags" placeholder="e.g. Math, Urgent, Midterm">
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="task-priority">
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <select id="task-difficulty">
+                        <option value="Easy">Easy</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit/View Task Modal -->
+    <div class="modal" id="modal-task-details">
+        <div class="modal-content" style="max-width: 650px;">
+            <span class="close-modal">&times;</span>
+            <h2 id="detail-task-title">Task Details</h2>
+            <div class="task-details-view">
+                <div style="display:flex; justify-content: space-between;">
+                    <div>
+                        <p><strong>Deadline:</strong> <span id="detail-task-deadline"></span></p>
+                        <p><strong>Priority:</strong> <span class="badge" id="detail-task-priority"></span></p>
+                        <p id="detail-task-tags-container"><strong>Tags:</strong> <span id="detail-task-tags"></span></p>
+                    </div>
+                    <div>
+                        <p><strong>Status:</strong> <span class="badge" id="detail-task-status"></span></p>
+                        <p><strong>Risk Level:</strong> <span class="badge" id="detail-task-risk"></span></p>
+                        <p><strong>Time Spent:</strong> <span id="detail-task-time"></span> mins</p>
+                    </div>
+                </div>
+                
+                <hr style="border: 1px solid var(--border-color); margin: 15px 0;">
+
+                <!-- Subtasks Checklist -->
+                <div class="subtasks-container" style="margin-bottom: 20px;">
+                    <h3><i class="fa-solid fa-check-double"></i> Sub-Tasks Checklist</h3>
+                    <div id="subtasks-list" style="margin-bottom: 10px;"></div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="new-subtask-title" placeholder="Add a mini-step..." style="margin-bottom:0;">
+                        <button class="btn btn-secondary" id="btn-add-subtask">Add</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Overall Progress (%)</label>
+                    <input type="range" id="task-progress-slider" min="0" max="100" class="progress-slider">
+                    <span id="task-progress-value"></span>%
+                </div>
+
+                <div class="form-group">
+                    <label>Rich Text Notes</label>
+                    <div id="editor-container" style="height: 150px; background: white; color: black; border-radius: var(--radius);"></div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="btn-save-details">Save Details</button>
+                    <button class="btn btn-danger" id="btn-delete-task">Delete Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Link Modal -->
+    <div class="modal" id="modal-invite">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2><i class="fa-solid fa-user-plus"></i> Invite Collaborator</h2>
+            <p style="color:var(--text-muted);margin-bottom:1.5rem;">Share this link. It expires in 24 hours.</p>
+            <div style="display:flex;gap:10px;">
+                <input type="text" id="invite-link-input" readonly style="flex:1;">
+                <button class="btn btn-primary" id="btn-copy-invite"><i class="fa-solid fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/static/js/app.js?v=10"></script>
+    <!-- Feature 5: Driver.js Onboarding -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+
+    <script>
+    /* ============================================================
+       TASKPULSE — DYNAMIC BACKGROUND ENGINE
+       Neural particle network + floating orbs
+    ============================================================ */
+    (function() {
+
+        /* ---------- 1. NEURAL PARTICLE NETWORK ---------- */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H, particles, isDark;
+
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', () => { resize(); initParticles(); });
+
+        function isDarkMode() {
+            return document.body.classList.contains('dark-mode');
+        }
+
+        function initParticles() {
+            const count = Math.floor((W * H) / 15000);
+            particles = Array.from({ length: Math.min(count, 80) }, () => ({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                r: Math.random() * 2.5 + 1,
+                opacity: Math.random() * 0.5 + 0.1
+            }));
+        }
+        initParticles();
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, W, H);
+            const dark = isDarkMode();
+            const dotColor = dark ? 'rgba(76, 201, 240,' : 'rgba(67, 97, 238,';
+            const lineColor = dark ? 'rgba(76, 201, 240,' : 'rgba(67, 97, 238,';
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = W;
+                if (p.x > W) p.x = 0;
+                if (p.y < 0) p.y = H;
+                if (p.y > H) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = dotColor + p.opacity + ')';
+                ctx.fill();
+            });
+
+            // Draw connecting lines between nearby particles
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const maxDist = 130;
+                    if (dist < maxDist) {
+                        const alpha = (1 - dist / maxDist) * 0.15;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = lineColor + alpha + ')';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+
+        /* ---------- 2. FLOATING GLOWING ORBS ---------- */
+        const orbContainer = document.getElementById('orb-container');
+        const orbDefs = [
+            { w: 500, h: 500, top: '-15%', left: '-10%', c1: '#4361ee', c2: '#7209b7', dur: 12, delay: 0 },
+            { w: 400, h: 400, top: '60%',  left: '70%',  c1: '#4cc9f0', c2: '#4361ee', dur: 9,  delay: 2 },
+            { w: 350, h: 350, top: '30%',  left: '40%',  c1: '#f72585', c2: '#b5179e', dur: 15, delay: 5 },
+            { w: 300, h: 300, top: '80%',  left: '15%',  c1: '#7209b7', c2: '#3a0ca3', dur: 11, delay: 3 },
+        ];
+
+        orbDefs.forEach((o, i) => {
+            const orb = document.createElement('div');
+            orb.style.cssText = [
+                `position:absolute`,
+                `width:${o.w}px`, `height:${o.h}px`,
+                `top:${o.top}`, `left:${o.left}`,
+                `border-radius:50%`,
+                `background:radial-gradient(circle, ${o.c1}, ${o.c2})`,
+                `filter:blur(90px)`,
+                `opacity:0.12`,
+                `animation:orbFloat${i} ${o.dur}s ease-in-out ${o.delay}s infinite`
+            ].join(';');
+            orbContainer.appendChild(orb);
+        });
+
+        // Inject keyframes for each orb dynamically
+        const style = document.createElement('style');
+        style.textContent = orbDefs.map((_, i) => `
+            @keyframes orbFloat${i} {
+                0%,100% { transform: translate(0,0) scale(1); }
+                33% { transform: translate(${20+i*10}px, ${-30-i*8}px) scale(${1.05+i*0.02}); }
+                66% { transform: translate(${-15-i*5}px, ${15+i*6}px) scale(${0.95-i*0.01}); }
+            }
+        `).join('');
+        document.head.appendChild(style);
+
+        /* ---------- 3. MOUSE PARALLAX EFFECT ON ORBS ---------- */
+        document.addEventListener('mousemove', (e) => {
+            const mx = (e.clientX / W - 0.5) * 20;
+            const my = (e.clientY / H - 0.5) * 20;
+            orbContainer.style.transform = `translate(${mx}px, ${my}px)`;
+            orbContainer.style.transition = 'transform 1s ease';
+        });
+
+    })();
+    </script>
+</body>
+</html>
