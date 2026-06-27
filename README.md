@@ -1,4 +1,4 @@
-**TaskPulse – Advanced Study Planner & Productivity Ecosystem**
+#**TaskPulse – Advanced Study Planner & Productivity Ecosystem**
 
 TaskPulse is a modern productivity and study management platform designed for students and professionals to efficiently organize tasks, manage study plans, and improve focus. The application combines intelligent task management, AI-powered features, collaboration tools, and productivity tracking within an interactive and user-friendly interface.
 
